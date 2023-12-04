@@ -1,0 +1,23 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="secondary">
+    <ion-title> Todo App </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="bg-img ">
+    <h1>Aujourd'hui</h1>
+    <h5> {{ currentDate | date:'shortDate' }} </h5>
+
+    <ion-card *ngFor="let task of allTasks">
+      <ion-item>
+        <ion-checkbox [checked]="task.checked"></ion-checkbox>
+        <ion-label>
+          <p>{{ task.text }} </p>
+          <p>{{ task.date | date:'shortTime' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-card>
+
+  </div>
+</ion-content>
