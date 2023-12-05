@@ -10,14 +10,30 @@
     <h5> {{ currentDate | date:'shortDate' }} </h5>
 
     <ion-card *ngFor="let task of allTasks">
+      <ion-item-sliding>
       <ion-item>
-        <ion-checkbox [checked]="task.checked"></ion-checkbox>
+        <ion-checkbox (ionChange)="changeCheckedValue(task)" [checked]="task.checked"></ion-checkbox>
         <ion-label>
-          <p>{{ task.text }} </p>
+          <p *ngIf="!task.checked">{{ task.text }} </p>
+          <p *ngIf="task.checked" style="text-decoration: line-through;">{{ task.text }} </p>
           <p>{{ task.date | date:'shortTime' }}</p>
         </ion-label>
       </ion-item>
+      <ion-item-options>
+        <ion-item-option (click)="deleteTask(task.id)" color="danger">Delete</ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
     </ion-card>
 
+   
+
+
+    <ion-item *ngIf="!showAddButton">
+      <ion-input #textNewTask type="text"></ion-input>
+      <ion-button (click)="addNewTask(textNewTask.value)" color="primary" shape="round">+</ion-button>
+    </ion-item>
+    <ion-button (click)="toggleButton()" *ngIf="!showAddButton" expand="block" color="success">Annuler </ion-button>
+    <ion-button (click)="toggleButton()" *ngIf="showAddButton" expand="full" color="primary">Ajouter </ion-button>
+  
   </div>
 </ion-content>

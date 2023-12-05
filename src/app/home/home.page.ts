@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -9,16 +10,89 @@ import { Component } from '@angular/core';
 export class HomePage {
   currentDate : Date;
   allTasks = [];
-  constructor(private http : HttpClient) {}
+  showAddButton = true;
+  //textNewTask = '';
+  constructor(private http : HttpClient, private alertCtrl : AlertController) {}
 
-  ngOnInit() {
-    this.currentDate = new Date(); // Date.now
-   // let a = Date.now
+  addNewTask(textNewTask) {
+    this.http.post('https://ng-tasks-c6b03.firebaseio.com/Tasks.json', 
+    {
+      checked : false,
+      date : new Date(),
+      text : textNewTask
+    }).subscribe(
+      {
+        next : (response) => {
+          console.log(response);
+          alert('Task Added');
+          this.toggleButton();
+          this.getAllTasks();
+        },
+        error : (err) => {
+          console.log(err);
+          
+        }
+      }
+      )
+    }
+    async deleteTask(id) {
+      let alert = await this.alertCtrl.create(
+        {
+          header : 'Confirmation',
+          message : 'Etes vous sur de vouloir supprimer ce task ?',
+          buttons : [
+            'No',
+            {
+              text : 'Yes',
+              handler : () => {
+                
+                this.http.delete(`https://ng-tasks-c6b03.firebaseio.com/Tasks/${id}.json`).subscribe(
+                  {
+                  next : (response) => {
+                    this.getAllTasks();
+                    
+                  },
+                  error : (err) => {
+                    console.log(err);
+                    
+                  }
+          
+                }
+              )
+              }
+            }
+          ]
+        }
+      )
+      await alert.present();
+
+  }
+
+  changeCheckedValue(task) {
+    this.http.patch(`https://ng-tasks-c6b03.firebaseio.com/Tasks/${task.id}.json`, 
+    {
+      checked : !task.checked
+    }).subscribe(
+      {
+        next : (response) => {
+          //alert('Task Updated');
+          this.getAllTasks();
+        }
+      }
+    )
+  }
+
+  toggleButton() {
+    this.showAddButton = !this.showAddButton;
+  }
+
+  getAllTasks() {
     this.http.get('https://ng-tasks-c6b03.firebaseio.com/Tasks.json').subscribe(
       {
         next : (response) => {
           console.log(response);
         //  this.allTasks = response;
+        this.allTasks = [];
         for (const key in response) {
           console.log(key);
 
@@ -53,6 +127,13 @@ export class HomePage {
         }
       
     );
+  }
+
+  ngOnInit() {
+    this.currentDate = new Date(); // Date.now
+    this.getAllTasks();
+   // let a = Date.now
+   
   //  this.http.get('https://jsonplaceholder.typicode.com/userrs').subscribe(
   //   {
   //     next : (data) => {
